@@ -1,0 +1,47 @@
+{
+  "name": "skedora",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "worker": "tsx src/workers/reminder-worker.ts",
+    "worker:dev": "tsx watch src/workers/reminder-worker.ts",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "bcryptjs": "^3.0.2",
+    "bullmq": "^6.4.0",
+    "dotenv": "^17.2.3",
+    "ioredis": "^6.0.0",
+    "jose": "^6.1.0",
+    "next": "^15.5.4",
+    "pg": "^8.16.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.18.6",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "^15.5.4",
+    "prisma": "^7.2.0",
+    "tailwindcss": "^4.1.13",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.2"
+  }
+}
