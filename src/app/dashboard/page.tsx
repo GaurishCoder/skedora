@@ -11,14 +11,17 @@ import {
 } from "@/lib/task-display";
 import { LogoutButton } from "./logout-button";
 import { TaskActions } from "./task-actions";
+import EnableNotifications from "@/components/notifications/EnableNotifications";
 
 type DashboardPageProps = {
   searchParams: Promise<{ status?: string }>;
 };
 
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
   const session = await getCurrentUserFromCookie();
-  
+
   if (!session) {
     redirect("/login");
   }
@@ -37,7 +40,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { status } = await searchParams;
   const selectedStatus =
-    status === "PENDING" || status === "IN_PROGRESS" || status === "COMPLETED" ? status : undefined;
+    status === "PENDING" || status === "IN_PROGRESS" || status === "COMPLETED"
+      ? status
+      : undefined;
 
   const tasks = await prisma.task.findMany({
     where: {
@@ -52,9 +57,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold tracking-[0.2em] text-stone-500 uppercase">
-            Dashboard
+            Dashboard 
           </p>
-          <h1 className="mt-3 text-4xl font-semibold text-stone-900">Hello, {user.username}</h1>
+          <h1 className="mt-3 text-4xl font-semibold text-stone-900">
+            Hello, {user.username}
+          </h1>
           <p className="mt-2 text-stone-600">{user.email}</p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -66,6 +73,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </Link>
           <LogoutButton />
         </div>
+        <EnableNotifications/>
       </div>
 
       <div className="mt-10 flex flex-wrap gap-2">
@@ -84,7 +92,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               key={filter.href}
               href={filter.href}
               className={`rounded-full px-4 py-2 text-sm font-medium ${
-                isActive ? "bg-stone-900 text-white" : "border border-stone-300 text-stone-800"
+                isActive
+                  ? "bg-stone-900 text-white"
+                  : "border border-stone-300 text-stone-800"
               }`}
             >
               {filter.label}
@@ -97,13 +107,17 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <section className="mt-8 rounded-3xl border border-stone-200 bg-white p-6">
           <h2 className="text-lg font-medium text-stone-900">No tasks yet</h2>
           <p className="mt-2 text-stone-600">
-            Create a task with a work deadline and a final task deadline to get started.
+            Create a task with a work deadline and a final task deadline to get
+            started.
           </p>
         </section>
       ) : (
         <ul className="mt-8 space-y-4">
           {tasks.map((task) => (
-            <li key={task.id} className="rounded-3xl border border-stone-200 bg-white p-6">
+            <li
+              key={task.id}
+              className="rounded-3xl border border-stone-200 bg-white p-6"
+            >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
@@ -125,7 +139,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                     </span>
                   </div>
                   {task.description ? (
-                    <p className="max-w-3xl text-stone-600">{task.description}</p>
+                    <p className="max-w-3xl text-stone-600">
+                      {task.description}
+                    </p>
                   ) : null}
                   <p className="text-sm text-stone-500">
                     Work deadline: {formatDeadline(task.workDeadline)}

@@ -20,7 +20,7 @@ export function getRedisOptions(): RedisOptions {
 
 export function createRedisConnection(customName = "skedora-redis"): Redis {
   const baseOptions = getRedisOptions();
-  const redisUrl = process.env.REDIS_URL;
+  const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 
   const client = redisUrl
     ? new Redis(redisUrl, {

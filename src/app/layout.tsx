@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
+import ServiceWorkerProvider from
+  "@/components/providers/ServiceWorkerProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,8 +21,10 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} min-h-screen antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen antialiased`}>
+        <ServiceWorkerProvider/>
+        {children}</body>
     </html>
   );
 }

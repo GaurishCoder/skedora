@@ -8,8 +8,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "worker": "tsx src/workers/reminder-worker.ts",
-    "worker:dev": "tsx watch src/workers/reminder-worker.ts",
+    "worker": "tsx src/workers/start-worker.ts",
+    "worker:dev": "tsx watch src/workers/start-worker.ts",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -27,6 +27,7 @@
     "pg": "^8.16.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "web-push": "^4.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/pg": "^8.15.5",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9.36.0",
     "eslint-config-next": "^15.5.4",
     "prisma": "^7.2.0",

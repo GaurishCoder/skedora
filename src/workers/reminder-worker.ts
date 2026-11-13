@@ -1,7 +1,7 @@
-import "dotenv/config";
 import { Worker, type Job } from "bullmq";
 import { createRedisConnection } from "@/lib/redis";
 import { prisma } from "@/lib/prisma";
+import { sendPushNotification } from "@/lib/send-push-notification";
 import {
   TASK_REMINDERS_QUEUE_NAME,
   type TaskReminderJobData,
@@ -65,27 +65,60 @@ export async function processReminderJob(job: Job<TaskReminderJobData>) {
     return { status: "skipped", reason: "DEADLINE_CHANGED" };
   }
 
-  // 5. Trigger notification (Requirement 15: log task ID and reminder type)
+
+  // 5. Prepare notification
+  const isWorkDeadline = reminderType === "WORK_DEADLINE";
+
+  const notificationPayload = {
+    title: isWorkDeadline
+      ? "Skedora - Work Deadline"
+      : "Skedora - Task Deadline",
+
+    body: isWorkDeadline
+      ? `Have you finished working on "${task.title}"? Don't forget to update your progress!`
+      : `Your task "${task.title}" is due now!`,
+
+    url: "/dashboard",
+  };
+
   console.log(
-    `\n============================================================\n` +
-      `[TASK REMINDER TRIGGERED]\n` +
-      `  Task ID:       ${task.id}\n` +
-      `  Reminder Type: ${reminderType}\n` +
-      `  Title:         "${task.title}"\n` +
-      `  Deadline:      ${currentDeadline.toISOString()}\n` +
-      `  Status:        ${task.status}\n` +
-      `  Priority:      ${task.priority}\n` +
-      `  Recipient:     ${task.user.username} <${task.user.email}>\n` +
-      `  Trigger Time:  ${new Date().toISOString()}\n` +
-      `============================================================\n`
+    `[Worker] Sending ${reminderType} push notification for task ${task.id}`
   );
+
+  // 6. Send browser push notification
+  const result = await sendPushNotification(
+    task.userId,
+    notificationPayload
+  );
+
+  console.log("[Worker] Push result:", result);
+
+  // 7. Handle delivery results
+  if (result.total === 0) {
+    console.warn(
+      `[Worker] No push subscriptions found for user ${task.userId}`
+    );
+
+    return {
+      status: "skipped",
+      reason: "NO_PUSH_SUBSCRIPTIONS",
+    };
+  }
+
+  if (result.failed > 0) {
+    throw new Error(
+      `Push notification failed for ${result.failed} of ${result.total} subscriptions`
+    );
+  }
 
   return {
     status: "delivered",
     taskId: task.id,
     reminderType,
     deliveredAt: new Date().toISOString(),
+    successful: result.successful,
   };
+
 }
 
 export const reminderWorker = new Worker<TaskReminderJobData>(
@@ -114,8 +147,7 @@ reminderWorker.on("completed", (job, returnvalue) => {
 
 reminderWorker.on("failed", (job, err) => {
   console.error(
-    `[Worker Failed] Job ${job?.id} failed for task ${job?.data.taskId}. Attempt ${
-      (job?.attemptsMade ?? 0)
+    `[Worker Failed] Job ${job?.id} failed for task ${job?.data.taskId}. Attempt ${(job?.attemptsMade ?? 0)
     }/${job?.opts.attempts ?? 1}. Error: ${err.message}`
   );
 });
